@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FinanSee — Gerenciamento Financeiro Pessoal</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- TELA DE AUTENTICAÇÃO -->
+    <div id="auth-screen" class="auth-screen">
+      <div class="auth-card">
+        <div class="auth-brand">
+          <div class="brand-logo-icon">F</div>
+          <div>
+            <h1 class="brand-title">FinanSee</h1>
+            <p class="brand-subtitle">Gerenciamento Financeiro</p>
+          </div>
+        </div>
+
+        <div class="auth-tabs">
+          <button type="button" id="tab-login-btn" class="auth-tab active">Entrar</button>
+          <button type="button" id="tab-register-btn" class="auth-tab">Criar Conta</button>
+        </div>
+
+        <div id="auth-feedback" class="feedback-banner hidden"></div>
+
+        <form id="login-form" class="auth-form">
+          <div class="form-group">
+            <label>E-mail</label>
+            <input type="email" id="login-email" value="demo@finansee.com" required />
+          </div>
+          <div class="form-group">
+            <label>Senha</label>
+            <input type="password" id="login-password" value="123456" required />
+          </div>
+          <button type="submit" class="btn btn-primary btn-full">Acessar Dashboard</button>
+          <p class="auth-demo-hint">
+            Demo: <strong>demo@finansee.com</strong> / <strong>123456</strong>
+          </p>
+        </form>
+
+        <form id="register-form" class="auth-form hidden">
+          <div class="form-group">
+            <label>Nome</label>
+            <input type="text" id="register-name" required />
+          </div>
+          <div class="form-group">
+            <label>E-mail</label>
+            <input type="email" id="register-email" required />
+          </div>
+          <div class="form-group">
+            <label>Senha (mín. 6 caracteres)</label>
+            <input type="password" id="register-password" required />
+          </div>
+          <button type="submit" class="btn btn-primary btn-full">Cadastrar</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- LAYOUT PRINCIPAL -->
+    <div id="app-layout" class="app-layout hidden">
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <div class="brand-logo-icon">F</div>
+          <div class="sidebar-brand-text">
+            <span>FinanSee</span>
+            <small>Tracker</small>
+          </div>
+        </div>
+
+        <nav class="sidebar-nav">
+          <button type="button" class="nav-item active" data-view="dashboard">Dashboard</button>
+          <button type="button" class="nav-item" data-view="transactions">Transações</button>
+          <button type="button" class="nav-item" data-view="goals">Metas</button>
+        </nav>
+
+        <div class="sidebar-footer">
+          <p>© 2026 FinanSee</p>
+        </div>
+      </aside>
+
+      <div class="main-wrapper">
+        <header class="topbar">
+          <div class="search-box">
+            <input type="text" id="global-search-input" placeholder="Buscar transação..." />
+          </div>
+          <div class="topbar-actions">
+            <div class="period-filter">
+              <label>Mês:</label>
+              <select id="month-filter-select">
+                <option value="all">Todos</option>
+              </select>
+            </div>
+            <div class="user-badge">
+              <div class="user-avatar" id="user-avatar-initials">ED</div>
+              <span id="user-display-name">Usuário</span>
+            </div>
+            <button type="button" id="logout-btn" class="btn-outline-sm">Sair</button>
+          </div>
+        </header>
+
+        <main class="content-area">
+          <div class="page-header">
+            <div>
+              <h2 id="page-title">Dashboard</h2>
+              <p class="page-subtitle">Visão geral das suas finanças</p>
+            </div>
+            <div class="page-header-buttons">
+              <button type="button" id="open-goal-modal-btn" class="btn btn-secondary">
+                + Nova Meta
+              </button>
+              <button type="button" id="open-transaction-modal-btn" class="btn btn-primary">
+                + Nova Transação
+              </button>
+            </div>
+          </div>
+
+          <!-- VIEW: DASHBOARD -->
+          <section id="view-dashboard">
+            <div class="summary-cards-grid">
+              <div class="summary-card">
+                <div>
+                  <span class="summary-label">Saldo Atual</span>
+                  <strong id="card-balance" class="summary-value">R$ 0,00</strong>
+                  <span class="summary-badge positive">Disponível</span>
+                </div>
+                <div class="summary-icon icon-purple">$</div>
+              </div>
+              <div class="summary-card">
+                <div>
+                  <span class="summary-label">Total de Receitas</span>
+                  <strong id="card-income" class="summary-value">R$ 0,00</strong>
+                  <span class="summary-badge positive">Entradas</span>
+                </div>
+                <div class="summary-icon icon-green">↑</div>
+              </div>
+              <div class="summary-card">
+                <div>
+                  <span class="summary-label">Total de Despesas</span>
+                  <strong id="card-expense" class="summary-value">R$ 0,00</strong>
+                  <span class="summary-badge negative">Saídas</span>
+                </div>
+                <div class="summary-icon icon-red">↓</div>
+              </div>
+              <div class="summary-card">
+                <div>
+                  <span class="summary-label">Valor Economizado</span>
+                  <strong id="card-saved" class="summary-value">R$ 0,00</strong>
+                  <span id="card-savings-rate" class="summary-badge neutral">0% poupado</span>
+                </div>
+                <div class="summary-icon icon-blue">%</div>
+              </div>
+            </div>
+
+            <div class="charts-grid">
+              <div class="panel-card">
+                <div class="panel-header"><h3>Receitas vs Despesas</h3></div>
+                <div class="chart-container"><canvas id="income-vs-expense-chart"></canvas></div>
+              </div>
+              <div class="panel-card">
+                <div class="panel-header"><h3>Despesas por Categoria</h3></div>
+                <div class="chart-container"><canvas id="category-pie-chart"></canvas></div>
+              </div>
+            </div>
+
+            <div class="bottom-panels-grid">
+              <div class="panel-card">
+                <div class="panel-header"><h3>Últimas Transações</h3></div>
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Descrição</th>
+                      <th>Categoria</th>
+                      <th>Data</th>
+                      <th class="text-right">Valor</th>
+                    </tr>
+                  </thead>
+                  <tbody id="recent-transactions-tbody"></tbody>
+                </table>
+              </div>
+              <div class="panel-card">
+                <div class="panel-header"><h3>Metas Financeiras</h3></div>
+                <div id="dashboard-goals-list" class="goals-compact-list"></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- VIEW: TRANSAÇÕES -->
+          <section id="view-transactions" class="hidden">
+            <div class="panel-card">
+              <div class="panel-header"><h3>Histórico de Transações</h3></div>
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Tipo</th>
+                    <th>Descrição</th>
+                    <th>Categoria</th>
+                    <th>Data</th>
+                    <th class="text-right">Valor</th>
+                    <th class="text-center">Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="full-transactions-tbody"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <!-- VIEW: METAS -->
+          <section id="view-goals" class="hidden">
+            <div id="full-goals-grid" class="goals-cards-grid"></div>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <!-- MODAL DE TRANSAÇÃO -->
+    <div id="transaction-modal" class="modal-overlay hidden">
+      <div class="modal-box">
+        <div class="modal-header">
+          <h3 id="transaction-modal-title">Nova Transação</h3>
+          <button type="button" id="close-transaction-modal-btn" class="modal-close">
+            &times;
+          </button>
+        </div>
+        <form id="transaction-form">
+          <input type="hidden" id="transaction-id" />
+          <div class="form-row-two">
+            <div class="form-group">
+              <label>Tipo</label>
+              <select id="transaction-type" required>
+                <option value="expense">Despesa</option>
+                <option value="income">Receita</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Categoria</label>
+              <select id="transaction-category" required>
+                <option value="Alimentação">Alimentação</option>
+                <option value="Transporte">Transporte</option>
+                <option value="Moradia">Moradia</option>
+                <option value="Saúde">Saúde</option>
+                <option value="Educação">Educação</option>
+                <option value="Lazer">Lazer</option>
+                <option value="Compras">Compras</option>
+                <option value="Outros">Outros</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Descrição</label>
+            <input type="text" id="transaction-description" required />
+          </div>
+          <div class="form-row-two">
+            <div class="form-group">
+              <label>Valor (R$)</label>
+              <input type="number" id="transaction-amount" step="0.01" min="0.01" required />
+            </div>
+            <div class="form-group">
+              <label>Data</label>
+              <input type="date" id="transaction-date" required />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">Salvar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- MODAL DE META -->
+    <div id="goal-modal" class="modal-overlay hidden">
+      <div class="modal-box">
+        <div class="modal-header">
+          <h3>Nova Meta Financeira</h3>
+          <button type="button" id="close-goal-modal-btn" class="modal-close">&times;</button>
+        </div>
+        <form id="goal-form">
+          <div class="form-group">
+            <label>Nome da Meta</label>
+            <input type="text" id="goal-name" required />
+          </div>
+          <div class="form-row-two">
+            <div class="form-group">
+              <label>Valor Desejado (R$)</label>
+              <input type="number" id="goal-target-amount" step="0.01" min="1" required />
+            </div>
+            <div class="form-group">
+              <label>Valor Atual (R$)</label>
+              <input type="number" id="goal-current-amount" step="0.01" min="0" required />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">Salvar Meta</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <script src="script.js"></script>
+  </body>
+</html>
